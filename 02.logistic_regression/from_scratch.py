@@ -31,6 +31,7 @@ class LogisticRegression:
         self.bias = 0
 
         # Gradient descent
+        epsilon = 1e-15  # To avoid log(0)
         for i in range(self.n_iterations):
             z = np.dot(X, self.weights) + self.bias
             y_predicted = self.sigmoid(z)
@@ -47,7 +48,6 @@ class LogisticRegression:
             self.bias -= self.learning_rate * db
 
             # Compute cost
-            epsilon = 1e-15  # To avoid log(0)
             cost = (-1 / n_samples) * np.sum(
                 y * np.log(y_predicted + epsilon)
                 + (1 - y) * np.log(1 - y_predicted + epsilon)
