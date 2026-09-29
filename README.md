@@ -1,7 +1,5 @@
 # Core ML Architecture & Implementations
 
-[![CI - Core ML Architecture Validation](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions)
-
 ## 📌 Overview
 This repository provides production-grade, object-oriented implementations of core machine learning and deep learning algorithms designed for quantitative research and algorithmic trading engineering.
 
