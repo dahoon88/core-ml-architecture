@@ -1,6 +1,6 @@
 """
 Core ML Architecture & Implementations - Validation & Benchmarking Suite
-Author: Senior ML Engineer & Quant Researcher Architecture Mentor
+
 Usage:
     uv run python main.py
     uv run python main.py --algo 1 4 8
@@ -29,8 +29,16 @@ if str(SRC_ROOT) not in sys.path:
 # Standard Package Imports from core_ml
 from core_ml.linear_regression import LinearRegression, SklearnLinearRegression
 from core_ml.logistic_regression import LogisticRegression, SklearnLogisticRegression
-from core_ml.decision_tree_and_ensemble import DecisionTree, SklearnDecisionTree, SklearnRandomForest
-from core_ml.neural_network import NeuralNetwork, PyTorchNeuralNetwork, SklearnNeuralNetwork
+from core_ml.decision_tree_and_ensemble import (
+    DecisionTree,
+    SklearnDecisionTree,
+    SklearnRandomForest,
+)
+from core_ml.neural_network import (
+    NeuralNetwork,
+    PyTorchNeuralNetwork,
+    SklearnNeuralNetwork,
+)
 from core_ml.k_means_clustering import KMeans, SklearnKMeans
 from core_ml.anomaly_detection import AnomalyDetector, SklearnAnomalyDetector
 from core_ml.recommender_system import MatrixFactorization, PytorchRecommender
@@ -97,7 +105,12 @@ def run_test_01() -> TestResult:
 # =====================================================================
 def run_test_02() -> TestResult:
     X, y = make_classification(
-        n_samples=600, n_features=6, n_informative=4, n_redundant=0, n_clusters_per_class=1, random_state=42
+        n_samples=600,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        n_clusters_per_class=1,
+        random_state=42,
     )
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
@@ -195,7 +208,11 @@ def run_test_04() -> TestResult:
     # From scratch
     t0 = time.perf_counter()
     scratch_mlp = NeuralNetwork(
-        input_size=8, hidden_size=16, output_size=1, learning_rate=0.05, n_iterations=800
+        input_size=8,
+        hidden_size=16,
+        output_size=1,
+        learning_rate=0.05,
+        n_iterations=800,
     )
     scratch_mlp.fit(X, y)
     scratch_pred = scratch_mlp.predict(X).flatten()
@@ -204,7 +221,11 @@ def run_test_04() -> TestResult:
     # PyTorch Framework
     t0 = time.perf_counter()
     pytorch_mlp = PyTorchNeuralNetwork(
-        input_size=8, hidden_size=16, output_size=1, learning_rate=0.01, n_iterations=400
+        input_size=8,
+        hidden_size=16,
+        output_size=1,
+        learning_rate=0.01,
+        n_iterations=400,
     )
     pytorch_mlp.fit(X, y)
     pytorch_pred = pytorch_mlp.predict(X)
@@ -233,7 +254,9 @@ def run_test_04() -> TestResult:
 # 05. K-Means Clustering
 # =====================================================================
 def run_test_05() -> TestResult:
-    X, _ = make_blobs(n_samples=600, centers=4, n_features=2, cluster_std=0.8, random_state=42)
+    X, _ = make_blobs(
+        n_samples=600, centers=4, n_features=2, cluster_std=0.8, random_state=42
+    )
 
     # From scratch
     t0 = time.perf_counter()
@@ -249,7 +272,9 @@ def run_test_05() -> TestResult:
     framework_labels = framework_kmeans.predict(X)
     t_framework = (time.perf_counter() - t0) * 1000
 
-    def compute_inertia(data: np.ndarray, centers: np.ndarray, labels: np.ndarray) -> float:
+    def compute_inertia(
+        data: np.ndarray, centers: np.ndarray, labels: np.ndarray
+    ) -> float:
         return float(np.sum((data - centers[labels]) ** 2))
 
     scratch_inertia = compute_inertia(X, scratch_kmeans.centroids, scratch_labels)
@@ -268,7 +293,7 @@ def run_test_05() -> TestResult:
         scratch_metric=scratch_inertia,
         framework_metric=framework_inertia,
         alignment_metric=1.0 - inertia_diff_ratio,
-        notes=f"Inertia Ratio: {scratch_inertia/framework_inertia:.2f}x",
+        notes=f"Inertia Ratio: {scratch_inertia / framework_inertia:.2f}x",
     )
 
 
@@ -353,14 +378,22 @@ def run_test_07() -> TestResult:
     # PyTorch Recommender
     t0 = time.perf_counter()
     pytorch_rec = PytorchRecommender(
-        n_users=n_users, n_items=n_items, n_factors=n_factors, learning_rate=0.05, n_iterations=400
+        n_users=n_users,
+        n_items=n_items,
+        n_factors=n_factors,
+        learning_rate=0.05,
+        n_iterations=400,
     )
     pytorch_rec.fit(R_sparse)
     R_pred_pytorch = pytorch_rec.predict()
     t_framework = (time.perf_counter() - t0) * 1000
 
-    scratch_rmse = float(np.sqrt(np.mean((R_sparse[obs_mask] - R_pred_scratch[obs_mask]) ** 2)))
-    pytorch_rmse = float(np.sqrt(np.mean((R_sparse[obs_mask] - R_pred_pytorch[obs_mask]) ** 2)))
+    scratch_rmse = float(
+        np.sqrt(np.mean((R_sparse[obs_mask] - R_pred_scratch[obs_mask]) ** 2))
+    )
+    pytorch_rmse = float(
+        np.sqrt(np.mean((R_sparse[obs_mask] - R_pred_pytorch[obs_mask]) ** 2))
+    )
 
     status = "PASS" if (scratch_rmse < 0.60 and pytorch_rmse < 0.60) else "FAIL"
     return TestResult(
@@ -372,7 +405,9 @@ def run_test_07() -> TestResult:
         metric_name="Train RMSE",
         scratch_metric=scratch_rmse,
         framework_metric=pytorch_rmse,
-        alignment_metric=float(np.corrcoef(R_pred_scratch.flatten(), R_pred_pytorch.flatten())[0, 1]),
+        alignment_metric=float(
+            np.corrcoef(R_pred_scratch.flatten(), R_pred_pytorch.flatten())[0, 1]
+        ),
         notes=f"Reconstruction Corr: {np.corrcoef(R_pred_scratch.flatten(), R_pred_pytorch.flatten())[0, 1]:.3f}",
     )
 
@@ -387,7 +422,9 @@ def run_test_08() -> TestResult:
     goal_state = 5
 
     t0 = time.perf_counter()
-    q_agent = QLearningAgent(n_states=n_states, n_actions=n_actions, learning_rate=0.1, discount_factor=0.9)
+    q_agent = QLearningAgent(
+        n_states=n_states, n_actions=n_actions, learning_rate=0.1, discount_factor=0.9
+    )
     for _ in range(300):
         s = 0
         for _ in range(20):
@@ -450,16 +487,22 @@ TEST_REGISTRY: Dict[int, Tuple[str, Callable[[], TestResult]]] = {
 def print_banner():
     print("=" * 95)
     print("  CORE-ML-ARCHITECTURE: ALGORITHM VALIDATION & BENCHMARKING SUITE")
-    print("  Package: core_ml (Standard src/ layout) | uv | NumPy Vectorized | PyTorch | Scikit-Learn")
+    print(
+        "  Package: core_ml (Standard src/ layout) | uv | NumPy Vectorized | PyTorch | Scikit-Learn"
+    )
     print("=" * 95)
 
 
 def print_summary_table(results: List[TestResult]):
     print("\n" + "=" * 95)
-    print(f"{'ID':<3} | {'Algorithm':<24} | {'Status':<6} | {'Metric':<12} | {'Scratch':<8} | {'Framework':<9} | {'Scratch(ms)':<11} | {'Notes'}")
+    print(
+        f"{'ID':<3} | {'Algorithm':<24} | {'Status':<6} | {'Metric':<12} | {'Scratch':<8} | {'Framework':<9} | {'Scratch(ms)':<11} | {'Notes'}"
+    )
     print("-" * 95)
     for r in results:
-        status_color = "\033[92mPASS\033[0m" if r.status == "PASS" else "\033[91mFAIL\033[0m"
+        status_color = (
+            "\033[92mPASS\033[0m" if r.status == "PASS" else "\033[91mFAIL\033[0m"
+        )
         print(
             f"{r.algo_id:<3} | {r.name:<24} | {status_color:<6} | {r.metric_name:<12} | "
             f"{r.scratch_metric:<8.4f} | {r.framework_metric:<9.4f} | {r.scratch_time_ms:<11.2f} | {r.notes}"
@@ -506,9 +549,13 @@ def main():
         try:
             res = test_fn()
             results.append(res)
-            print(f"[{res.status}] ({res.scratch_time_ms:.1f}ms scratch vs {res.framework_time_ms:.1f}ms framework)")
+            print(
+                f"[{res.status}] ({res.scratch_time_ms:.1f}ms scratch vs {res.framework_time_ms:.1f}ms framework)"
+            )
             if args.verbose:
-                print(f"    -> Metric: {res.metric_name} | Scratch: {res.scratch_metric:.4f} | Framework: {res.framework_metric:.4f}")
+                print(
+                    f"    -> Metric: {res.metric_name} | Scratch: {res.scratch_metric:.4f} | Framework: {res.framework_metric:.4f}"
+                )
                 print(f"    -> Detail: {res.notes}")
         except Exception as e:
             print(f"[ERROR: {e}]")
@@ -531,7 +578,9 @@ def main():
     print_summary_table(results)
 
     total_passed = sum(1 for r in results if r.status == "PASS")
-    print(f"\nExecution Complete: {total_passed}/{len(results)} tests passed in {elapsed_sec:.2f}s.")
+    print(
+        f"\nExecution Complete: {total_passed}/{len(results)} tests passed in {elapsed_sec:.2f}s."
+    )
 
     if total_passed < len(results):
         sys.exit(1)
