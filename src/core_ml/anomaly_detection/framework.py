@@ -8,7 +8,7 @@ class AnomalyDetector:
         self.random_state = random_state
 
         self.model = IsolationForest(
-            contaminationm=self.contamination, random_state=self.random_state
+            contamination=self.contamination, random_state=self.random_state
         )
 
     def fit(self, X: np.ndarray):

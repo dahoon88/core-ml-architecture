@@ -88,10 +88,10 @@ class DQNAgent:
         batch = random.sample(self.memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
 
-        states_tensor = torch.FloatTensor(states)
+        states_tensor = torch.FloatTensor(np.array(states))
         actions_tensor = torch.LongTensor(actions).unsqueeze(1)
         rewards_tensor = torch.FloatTensor(rewards).unsqueeze(1)
-        next_states_tensor = torch.FloatTensor(next_states)
+        next_states_tensor = torch.FloatTensor(np.array(next_states))
         dones_tensor = torch.FloatTensor(dones).unsqueeze(1)
 
         # Compute target Q-values
